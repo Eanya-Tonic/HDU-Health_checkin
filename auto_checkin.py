@@ -86,32 +86,12 @@ def daka(un,pd,sendkey):
                 print("正在点击确认按钮")
                 browser.find_element_by_class_name('van-dialog__confirm').click()
                 print("点击确认按钮成功")
+                serverchan(sendkey,"打卡成功！")
             except (NoSuchElementException, ElementNotInteractableException):
                 print(un+"授权地理位置时出错")
                 serverchan(sendkey, "授权地理位置时出错")
                 browser.quit()
                 return
-            # 点击 确认打卡 按钮
-            try:
-                browser.find_element_by_css_selector('.van-button.van-button--info.van-button--normal').click()
-            except NoSuchElementException:
-                serverchan(sendkey, "打卡失败，确认打卡时出错！")
-                print(un+"打卡失败，确认打卡时出错")
-                browser.quit()
-                return 
-            time.sleep(3)
-            # 点击 确认负责 按钮
-            try:
-                print("正在确认负责")
-                browser.find_element_by_css_selector('.van-button.van-button--default.van-button--large.van-dialog__confirm.van'
-                                                '-hairline--left').click()
-                print(un+"打卡成功！")
-                serverchan(sendkey,"打卡成功！")
-            except NoSuchElementException:
-                serverchan(sendkey, "打卡失败，确认负责时出错！")
-                print(un+"打卡失败，确认负责时出错")
-                browser.quit()
-                return 
             # 退出窗口
             browser.quit()
 
