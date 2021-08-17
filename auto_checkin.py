@@ -14,8 +14,6 @@ options.add_argument('--no-sandbox')
 # 无头参数
 options.add_argument('--headless')
 options.add_argument('--disable-gpu')
-#设置ua
-options.add_argument('user-agent="Mozilla/5.0 (Linux Android 8.0.0 MIX 2 Build/OPR1.170623.027 wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/71.0.3578.99 Mobile Safari/537.36 yiban_android"')
 #设置模拟位置数据：杭州市钱塘区120.350228,30.324128，更多位置查询：http://api.map.baidu.com/lbsapi/getpoint/
 params = {
     "latitude": 30.324128,
@@ -32,7 +30,7 @@ def serverchan(sendkey, msg):
         # serverchan消息推送 https://sctapi.ftqq.com/****************.send?title=messagetitle
         url = "https://sctapi.ftqq.com/" + str(sendkey)+".send?title="+str(msg)
         browser.get(url)
-        time.sleep(2)
+        time.sleep(3)
         # 退出窗口
         browser.quit()
 
@@ -44,10 +42,11 @@ def daka(un,pd,sendkey):
     #避免爬虫被检测
     script='''Object.defineProperties(navigator, {webdriver:{get:()=>undefined}})'''
     browser.execute_script(script)
-    # 访问url
-    browser.get("https://cas.hdu.edu.cn/cas/login?service=https%3A%2F%2Fapi.hduhelp.com%2Fsso%3Fstate%3D5d445fdc-d3d4-44e7-ad3a-975eede5dcbd")
+    # 访问数字杭电
+    browser.get("https://cas.hdu.edu.cn/cas/login")
     # 窗口最大化
     browser.maximize_window()
+    time.sleep(2)
     #登录账户
     browser.find_element_by_id('un').clear()
     browser.find_element_by_id('un').send_keys(un)#传送帐号
@@ -64,7 +63,15 @@ def daka(un,pd,sendkey):
         serverchan(sendkey, "帐号登录失败")
         browser.quit()#帐号登录失败
     else:
+        #访问打卡界面
+        browser.get("https://healthcheckin.hduhelp.com/")
         print("正在执行"+un+"操作")
+        time.sleep(3)
+        #注入ua
+        browser.execute_cdp_cmd("Emulation.setUserAgentOverride", {"userAgent": "Mozilla/5.0 (Linux Android 8.0.0 MIX 2 Build/OPR1.170623.027 wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/71.0.3578.99 Mobile Safari/537.36 yiban_android"})
+        #重新打开打卡界面
+        browser.get("https://healthcheckin.hduhelp.com/")
+        time.sleep(3)
         # 点击 确认打卡 按钮
         print("正在点击确认抗疫答题按钮")
         try:
