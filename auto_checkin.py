@@ -12,7 +12,7 @@ DRIVER_PATH = './chromedriver'
 options = Options()
 options.add_argument('--no-sandbox')
 # 无头参数
-options.add_argument('--headless')
+# options.add_argument('--headless')
 options.add_argument('--disable-gpu')
 #设置模拟位置数据：杭州市钱塘区120.350228,30.324128，更多位置查询：http://api.map.baidu.com/lbsapi/getpoint/
 params = {
@@ -60,7 +60,7 @@ def daka(un,pd,sendkey):
         flag=False
     if flag==True:
         print(un+"帐号登录失败")
-        serverchan(sendkey, "帐号登录失败")
+        serverchan(sendkey, un+"帐号登录失败")
         browser.quit()#帐号登录失败
     else:
         #访问打卡界面
@@ -79,10 +79,11 @@ def daka(un,pd,sendkey):
             print("点击确认抗疫答题按钮成功")
         except NoSuchElementException:
             pass
+        time.sleep(8)
         print("正在点击确认打卡按钮")
         if browser.find_element_by_css_selector('.van-button.van-button--info.van-button--normal').is_enabled()==False:
             print(un+"今日已打卡")
-            serverchan(sendkey, "今日已打卡！")
+            serverchan(sendkey, un+"今日已打卡！")
             browser.quit()
         else:
             # 疫苗选择按钮默认使用 第三针/共三针 的xpath，可以根据自己的情况修改
@@ -96,10 +97,14 @@ def daka(un,pd,sendkey):
                 print("正在点击确认按钮")
                 browser.find_element_by_class_name('van-dialog__confirm').click()
                 print("点击确认按钮成功")
-                serverchan(sendkey,"打卡成功！")
+                time.sleep(3)
+                if browser.find_element_by_css_selector('.van-button.van-button--info.van-button--normal').is_enabled()==False:
+                    serverchan(sendkey,un+"打卡成功！")
+                else:
+                    serverchan(sendkey,un+"打卡时出现未知错误")
             except (NoSuchElementException, ElementNotInteractableException):
                 print(un+"授权地理位置时出错")
-                serverchan(sendkey, "授权地理位置时出错")
+                serverchan(sendkey, un+"授权地理位置时出错")
                 browser.quit()
                 return
             # 退出窗口
