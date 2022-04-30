@@ -85,8 +85,8 @@ def daka(un,pd,sendkey):
             serverchan(sendkey, "今日已打卡！")
             browser.quit()
         else:
-            # 疫苗选择按钮默认使用 第二针/共两针 的xpath，可以根据自己的情况修改
-            browser.find_element_by_xpath('/html/body/div[1]/div[2]/div[3]/div[4]/div[8]/div[2]/div/div[4]/div[2]').click()
+            # 疫苗选择按钮默认使用 第三针/共三针 的xpath，可以根据自己的情况修改
+            browser.find_element_by_xpath('/html/body/div[1]/div[2]/div[3]/div[4]/div[8]/div[2]/div/div[7]/div[2]').click()
             print('点击疫苗选择按钮成功')
             browser.find_element_by_css_selector('.van-button.van-button--info.van-button--normal').click()
             print("点击确认打卡按钮成功")
