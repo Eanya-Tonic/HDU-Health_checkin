@@ -1,3 +1,4 @@
+#coding=utf-8
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 # 导入时间模块
@@ -7,19 +8,19 @@ from selenium.common.exceptions import NoSuchElementException, ElementClickInter
 
 # 获取驱动路径
 # linux
-DRIVER_PATH = './chromedriver'
+DRIVER_PATH = '/usr/bin/chromedriver'
 # 浏览器设置
 options = Options()
 options.add_argument('--no-sandbox')
+options.add_argument("--disable-blink-features=AutomationControlled")
+options.add_argument("user-agent=#{linux_useragent}")
+options.add_argument("--disable-web-security")
+options.add_argument("--disable-xss-auditor")
+options.add_experimental_option('excludeSwitches', ['enable-automation'])
+options.add_experimental_option('useAutomationExtension', False)
 # 无头参数
-# options.add_argument('--headless')
+options.add_argument('--headless')
 options.add_argument('--disable-gpu')
-#设置模拟位置数据：杭州市钱塘区120.350228,30.324128，更多位置查询：http://api.map.baidu.com/lbsapi/getpoint/
-params = {
-    "latitude": 30.324128,
-    "longitude": 120.350228,
-    "accuracy": 100
-}
 
 #serverchan函数
 def serverchan(sendkey, msg):
@@ -38,10 +39,6 @@ def serverchan(sendkey, msg):
 
 def daka(un,pd,sendkey):
     browser = Chrome(executable_path=DRIVER_PATH, options=options)
-    browser.execute_cdp_cmd("Emulation.setGeolocationOverride", params)
-    #避免爬虫被检测
-    script='''Object.defineProperties(navigator, {webdriver:{get:()=>undefined}})'''
-    browser.execute_script(script)
     # 访问数字杭电
     browser.get("https://cas.hdu.edu.cn/cas/login")
     # 窗口最大化
@@ -64,55 +61,41 @@ def daka(un,pd,sendkey):
         browser.quit()#帐号登录失败
     else:
         #访问打卡界面
-        browser.get("https://healthcheckin.hduhelp.com/")
+        browser.get("https://skl.hduhelp.com/passcard.html#/passcard")
         print("正在执行"+un+"操作")
-        time.sleep(3)
+        time.sleep(10)
         #注入ua
-        browser.execute_cdp_cmd("Emulation.setUserAgentOverride", {"userAgent": "Mozilla/5.0 (Linux Android 8.0.0 MIX 2 Build/OPR1.170623.027 wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/71.0.3578.99 Mobile Safari/537.36 yiban_android"})
+        browser.execute_cdp_cmd("Emulation.setUserAgentOverride", {"userAgent": "Mozilla/5.0 (Linux; Android 11; Pixel 4 XL Build/RQ3A.210705.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.106 Mobile Safari/537.36 AliApp(DingTalk/5.1.5) com.alibaba.android.rimet/13534898 Channel/212200 language/zh-CN UT4Aplus/0.2.25 colorScheme/light"})
         #重新打开打卡界面
-        browser.get("https://healthcheckin.hduhelp.com/")
+        browser.get("https://skl.hduhelp.com/passcard.html#/punch")
         time.sleep(3)
-        # 点击 确认打卡 按钮
-        print("正在点击确认抗疫答题按钮")
+        #输入位置信息
+        browser.execute_script("window.localStorage.setItem('punch','{\"currentLocation\":\"浙江省杭州市钱塘区\",\"city\":\"杭州市\",\"districtAdcode\":\"330114\",\"province\":\"浙江省\",\"district\":\"钱塘区\",\"healthCode\":0,\"healthReport\":0,\"currentLiving\":0,\"last14days\":0}')")
+        #执行确认打卡
+        browser.refresh()
+        time.sleep(2)
+        #滚动到底部
+        browser.execute_script("window.scrollTo(0,document.body.clientHeight)")
+        time.sleep(2)
+        browser.find_element_by_xpath('/html/body/div[1]/div/div/div[3]/div/form/div[12]/div').click()
+        browser.find_element_by_xpath('/html/body/div[1]/div/div/div[3]/div/form/div[13]/button').click()
+        time.sleep(3)
         try:
-            browser.find_element_by_css_selector('.van-hairline--top.van-dialog__footer').click()
-            print("点击确认抗疫答题按钮成功")
-        except NoSuchElementException:
-            pass
-        time.sleep(8)
-        print("正在点击确认打卡按钮")
-        if browser.find_element_by_css_selector('.van-button.van-button--info.van-button--normal').is_enabled()==False:
-            print(un+"今日已打卡")
-            serverchan(sendkey, un+"今日已打卡！")
+            browser.find_element_by_css_selector('.text-center.is-success').click()
+            print(un+"点击打卡按钮成功")
+            serverchan(sendkey,un+"打卡成功！")
+        except (NoSuchElementException, ElementNotInteractableException):
+            print(un+"打卡时出错")
+            serverchan(sendkey, un+"打卡时出错")
             browser.quit()
-        else:
-            # 疫苗选择按钮默认使用 第三针/共三针 的xpath，可以根据自己的情况修改
-            browser.find_element_by_xpath('/html/body/div[1]/div[2]/div[3]/div[4]/div[8]/div[2]/div/div[7]/div[2]').click()
-            print('点击疫苗选择按钮成功')
-            browser.find_element_by_css_selector('.van-button.van-button--info.van-button--normal').click()
-            print("点击确认打卡按钮成功")
-            time.sleep(8)
-            # 点击弹出的 确认 按钮
-            try:
-                print("正在点击确认按钮")
-                browser.find_element_by_class_name('van-dialog__confirm').click()
-                print("点击确认按钮成功")
-                time.sleep(3)
-                if browser.find_element_by_css_selector('.van-button.van-button--info.van-button--normal').is_enabled()==False:
-                    serverchan(sendkey,un+"打卡成功！")
-                else:
-                    serverchan(sendkey,un+"打卡时出现未知错误")
-            except (NoSuchElementException, ElementNotInteractableException):
-                print(un+"授权地理位置时出错")
-                serverchan(sendkey, un+"授权地理位置时出错")
-                browser.quit()
-                return
-            # 退出窗口
-            browser.quit()
+            return
+        time.sleep(3)
+        # 退出窗口
+        browser.quit()
 
 #相关参数定义
-un="000"#学号
-pd="***"#数字杭电密码
+un=""#学号
+pd=""#数字杭电密码
 #ServerChan发送key，0表示不启用推送
 sendkey='0'
 daka(un,pd,sendkey)
