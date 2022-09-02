@@ -89,7 +89,11 @@ def daka(un,pd,sendkey):
         browser.execute_script("window.scrollTo(0,document.body.clientHeight)")
         time.sleep(2)
         browser.find_element_by_xpath('/html/body/div[1]/div/div/div[3]/div/form/div[12]/div').click()
-        browser.find_element_by_xpath('/html/body/div[1]/div/div/div[3]/div/form/div[13]/button').click()
+        submit = browser.find_element_by_xpath('/html/body/div[1]/div/div/div[3]/div/form/div[13]/button')
+        if "disabled" in submit.get_attribute('class'):
+            browser.execute_script("arguments[0].disabled = false", submit)
+            browser.execute_script("arguments[0].setAttribute(arguments[1],arguments[2])", submit, 'class', "van-button van-button--primary van-button--normal van-button--block van-button--round")
+        submit.click()
         time.sleep(3)
         try:
             browser.find_element_by_css_selector('.text-center.is-success').click()
