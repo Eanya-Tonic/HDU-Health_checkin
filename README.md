@@ -2,6 +2,7 @@
 基于Legroft大佬的脚本编写的杭州电子科技大学自动健康打卡脚本
 原仓库链接https://github.com/Legroft/HDU-DailyHealthy
 详细使用说明可参考原仓库
+代码采用Python2编写，在Python3上可能无法运行！
 
 
 
