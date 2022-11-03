@@ -4,6 +4,8 @@ from selenium.webdriver.chrome.options import Options
 # 导入时间模块
 import time
 from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException,ElementNotInteractableException
+# 导入随机模块
+import random
 
 
 # 获取驱动路径
@@ -51,7 +53,9 @@ def daka(un,pd,sendkey):
     browser.get("https://cas.hdu.edu.cn/cas/login")
     # 窗口最大化
     browser.maximize_window()
-    time.sleep(2)
+    # 随机睡眠
+    randomSleep = random.randint(8,525)
+    time.sleep(randomSleep)
     # 登录账户
     browser.find_element_by_id('un').clear()
     browser.find_element_by_id('un').send_keys(un)# 传送帐号
