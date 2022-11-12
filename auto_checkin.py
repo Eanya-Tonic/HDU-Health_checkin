@@ -92,7 +92,7 @@ def daka(un,pd,sendkey):
         # 滚动到底部
         browser.execute_script("window.scrollTo(0,document.body.clientHeight)")
         time.sleep(2)
-        browser.find_element_by_xpath('/html/body/div[1]/div/div/div[3]/div/form/div[12]/div').click()
+        browser.find_element_by_xpath('/html/body//form//div[@role="checkbox"]').click()
         submit = browser.find_element_by_xpath('/html/body/div[1]/div/div/div[3]/div/form/div[13]/button')
         if "disabled" in submit.get_attribute('class'):
             browser.execute_script("arguments[0].disabled = false", submit)
